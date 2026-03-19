@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
+    <style>body { margin: 0; background: #111; display: flex; justify-content: center; align-items: center; height: 100vh; }</style>
+</head>
+<body>
+<script>
+    const config = {
+        type: Phaser.AUTO, width: 400, height: 400,
+        scene: { create: create }
+    };
+    let score = 0, timer = 10, scoreText, timerText, btn, running = true;
+    new Phaser.Game(config);
+    function create() {
+        scoreText = this.add.text(20, 20, 'Clicks: 0', { fontSize: '24px', fill: '#fff' });
+        timerText = this.add.text(20, 50, 'Tiempo: 10', { fontSize: '24px', fill: '#ff0' });
+        btn = this.add.circle(200, 200, 80, 0xff2d20).setInteractive();
+        this.add.text(170, 190, 'CLICK!', { font: 'bold 16px Arial', fill: '#fff' });
+        btn.on('pointerdown', () => {
+            if (!running) return;
+            score++;
+            scoreText.setText('Clicks: ' + score);
+            btn.setScale(0.9);
+            setTimeout(() => btn.setScale(1), 50);
+        });
+        this.time.addEvent({ delay: 1000, repeat: 10, callback: () => {
+            timer--;
+            if (timer <= 0) {
+                running = false;
+                timerText.setText('FIN!');
+                this.add.text(100, 300, 'PUNTUACIÓN: ' + score, { fontSize: '24px', fill: '#0f0' });
+            } else {
+                timerText.setText('Tiempo: ' + timer);
+            }
+        }});
+    }
+</script>
+</body>
+</html>

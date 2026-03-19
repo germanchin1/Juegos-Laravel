@@ -13,11 +13,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Create Default Roles
+        $adminRole = \App\Models\Role::create(['name' => 'Administrador', 'slug' => 'administrador']);
+        $gestorRole = \App\Models\Role::create(['name' => 'Gestor', 'slug' => 'gestor']);
+        $jugadorRole = \App\Models\Role::create(['name' => 'Jugador', 'slug' => 'jugador']);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Create Admin User
+        $admin = User::factory()->create([
+            'name' => 'Admin User',
+            'email' => 'admin@admin.com',
+            'password' => bcrypt('password'),
         ]);
+
+        // Assign Admin Role
+        $admin->roles()->attach($adminRole);
+
+        // Create a Player User for testing
+        $player = User::factory()->create([
+            'name' => 'Player User',
+            'email' => 'player@player.com',
+            'password' => bcrypt('password'),
+        ]);
+        $player->roles()->attach($jugadorRole);
     }
 }

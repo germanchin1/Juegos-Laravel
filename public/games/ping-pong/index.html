@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
+    <style>
+        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-family: sans-serif; }
+        canvas { border: 2px solid #fff; }
+    </style>
+</head>
+<body>
+    <script>
+    const config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: { y: 0 },
+                debug: false
+            }
+        },
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    let ball;
+    let player;
+    let computer;
+    let cursors;
+    let scorePlayer = 0;
+    let scoreComputer = 0;
+    let scoreText;
+
+    const game = new Phaser.Game(config);
+
+    function preload () {}
+
+    function create () {
+        // Paddles
+        player = this.add.rectangle(40, 300, 20, 100, 0xffffff);
+        this.physics.add.existing(player);
+        player.body.setCollideWorldBounds(true);
+        player.body.setImmovable(true);
+
+        computer = this.add.rectangle(760, 300, 20, 100, 0xffffff);
+        this.physics.add.existing(computer);
+        computer.body.setCollideWorldBounds(true);
+        computer.body.setImmovable(true);
+
+        // Ball
+        ball = this.add.circle(400, 300, 10, 0xff2d20);
+        this.physics.add.existing(ball);
+        ball.body.setCollideWorldBounds(true);
+        ball.body.setBounce(1, 1);
+        ball.body.setVelocity(300, 300);
+
+        // Score
+        scoreText = this.add.text(350, 20, '0 - 0', { fontSize: '32px', fill: '#fff' });
+
+        // Physics
+        this.physics.add.collider(ball, player);
+        this.physics.add.collider(ball, computer);
+
+        cursors = this.input.keyboard.createCursorKeys();
+    }
+
+    function update () {
+        // Player movement
+        if (cursors.up.isDown) {
+            player.body.setVelocityY(-400);
+        } else if (cursors.down.isDown) {
+            player.body.setVelocityY(400);
+        } else {
+            player.body.setVelocityY(0);
+        }
+
+        // Simple Computer AI
+        if (ball.y < computer.y) {
+            computer.body.setVelocityY(-250);
+        } else if (ball.y > computer.y) {
+            computer.body.setVelocityY(250);
+        }
+
+        // Check for score
+        if (ball.x < 15) {
+            scoreComputer++;
+            resetBall();
+        } else if (ball.x > 785) {
+            scorePlayer++;
+            resetBall();
+        }
+
+        scoreText.setText(scorePlayer + ' - ' + scoreComputer);
+    }
+
+    function resetBall() {
+        ball.body.setPosition(400, 300);
+        ball.body.setVelocity(300, (Math.random() > 0.5 ? 300 : -300));
+    }
+    </script>
+</body>
+</html>
