@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: #f8fafc;
+        }
+        .header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-gap: 15px;
+            perspective: 1000px;
+        }
+        .card {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .card.matched {
+            cursor: default;
+            opacity: 0.7;
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .card-front {
+            background: #1e293b;
+            border: 2px solid #334155;
+        }
+        .card-back {
+            background: #38bdf8;
+            transform: rotateY(180deg);
+            color: #0f172a;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        .overlay.visible {
+            display: flex;
+        }
+        .btn {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Memory Match</h1>
+        <div class="stats">
+            <div>Intentos: <span id="moves">0</span></div>
+            <div>Pares: <span id="pairs">0</span>/8</div>
+        </div>
+    </div>
+    <div class="grid" id="grid"></div>
+
+    <div class="overlay" id="overlay">
+        <h2 style="font-size: 3rem; color: #38bdf8;">¡Victoria!</h2>
+        <p id="final-stats"></p>
+        <button class="btn" onclick="initGame()">Jugar de nuevo</button>
+    </div>
+
+    <script>
+        const symbols = ['🚀', '🪐', '⭐', '👾', '🌀', '🛰️', '☄️', '🌌'];
+        let cards = [];
+        let flippedCards = [];
+        let moves = 0;
+        let matchedPairs = 0;
+        let canFlip = true;
+
+        const gridElement = document.getElementById('grid');
+        const movesElement = document.getElementById('moves');
+        const pairsElement = document.getElementById('pairs');
+        const overlay = document.getElementById('overlay');
+        const finalStats = document.getElementById('final-stats');
+
+        function initGame() {
+            gridElement.innerHTML = '';
+            cards = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
+            flippedCards = [];
+            moves = 0;
+            matchedPairs = 0;
+            canFlip = true;
+            movesElement.textContent = moves;
+            pairsElement.textContent = matchedPairs;
+            overlay.classList.remove('visible');
+
+            cards.forEach((symbol, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = index;
+                card.dataset.symbol = symbol;
+                card.innerHTML = `
+                    <div class="card-face card-front"></div>
+                    <div class="card-face card-back">${symbol}</div>
+                `;
+                card.addEventListener('click', () => flipCard(card));
+                gridElement.appendChild(card);
+            });
+        }
+
+        function flipCard(card) {
+            if (!canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+            card.classList.add('flipped');
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                movesElement.textContent = moves;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            canFlip = false;
+            const [card1, card2] = flippedCards;
+
+            if (card1.dataset.symbol === card2.dataset.symbol) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                pairsElement.textContent = matchedPairs;
+                flippedCards = [];
+                canFlip = true;
+
+                if (matchedPairs === symbols.length) {
+                    showWin();
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    flippedCards = [];
+                    canFlip = true;
+                }, 1000);
+            }
+        }
+
+        function showWin() {
+            finalStats.textContent = `Completado en ${moves} intentos.`;
+            overlay.classList.add('visible');
+        }
+
+        initGame();
+    </script>
+</body>
+</html>

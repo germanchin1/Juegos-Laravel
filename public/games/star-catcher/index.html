@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Catcher</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        canvas {
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+            border: 2px solid #334155;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            backgroundColor: '#0f172a',
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+
+        let player;
+        let stars;
+        let score = 0;
+        let scoreText;
+        let cursors;
+        let gameOver = false;
+        let lives = 3;
+        let livesText;
+
+        const game = new Phaser.Game(config);
+
+        function preload() {
+            // No external assets for simplicity, using graphics
+        }
+
+        function create() {
+            // Background grid
+            const graphics = this.add.graphics();
+            graphics.lineStyle(1, 0x1e293b, 1);
+            for (let i = 0; i < 800; i += 40) {
+                graphics.moveTo(i, 0);
+                graphics.lineTo(i, 600);
+            }
+            for (let i = 0; i < 600; i += 40) {
+                graphics.moveTo(0, i);
+                graphics.lineTo(800, i);
+            }
+            graphics.strokePath();
+
+            // Player (Glowy Paddle)
+            player = this.add.rectangle(400, 560, 100, 20, 0x38bdf8);
+            this.physics.add.existing(player);
+            player.body.setCollideWorldBounds(true);
+            player.body.setImmovable(true);
+            
+            // Stars group
+            stars = this.physics.add.group();
+
+            // Spawn stars timer
+            this.time.addEvent({
+                delay: 1000,
+                callback: spawnStar,
+                callbackScope: this,
+                loop: true
+            });
+
+            // UI
+            scoreText = this.add.text(20, 20, 'Score: 0', { 
+                fontSize: '24px', 
+                fill: '#f8fafc',
+                fontFamily: 'Inter'
+            });
+            
+            livesText = this.add.text(680, 20, 'Lives: 3', { 
+                fontSize: '24px', 
+                fill: '#f8fafc',
+                fontFamily: 'Inter'
+            });
+
+            // Input
+            cursors = this.input.keyboard.createCursorKeys();
+
+            // Collisions
+            this.physics.add.overlap(player, stars, collectStar, null, this);
+        }
+
+        function update() {
+            if (gameOver) return;
+
+            if (cursors.left.isDown) {
+                player.body.setVelocityX(-500);
+            } else if (cursors.right.isDown) {
+                player.body.setVelocityX(500);
+            } else {
+                player.body.setVelocityX(0);
+            }
+
+            // Check for missed stars
+            stars.children.iterate((star) => {
+                if (star && star.y > 600) {
+                    star.destroy();
+                    loseLife.call(this);
+                }
+            });
+        }
+
+        function spawnStar() {
+            if (gameOver) return;
+            
+            const x = Phaser.Math.Between(50, 750);
+            const star = this.add.circle(x, -20, 10, 0xfde047);
+            this.physics.add.existing(star);
+            star.body.setVelocityY(Phaser.Math.Between(200, 400));
+            stars.add(star);
+            
+            // Neon glow for star
+            this.add.tween({
+                targets: star,
+                scaleX: 1.2,
+                scaleY: 1.2,
+                duration: 500,
+                yoyo: true,
+                repeat: -1
+            });
+        }
+
+        function collectStar(player, star) {
+            star.destroy();
+            score += 10;
+            scoreText.setText('Score: ' + score);
+            
+            // Feedback effect
+            const flash = this.add.circle(star.x, star.y, 20, 0xffffff, 0.5);
+            this.add.tween({
+                targets: flash,
+                alpha: 0,
+                scale: 2,
+                duration: 200,
+                onComplete: () => flash.destroy()
+            });
+        }
+
+        function loseLife() {
+            lives--;
+            livesText.setText('Lives: ' + lives);
+            
+            this.cameras.main.shake(200, 0.01);
+            
+            if (lives <= 0) {
+                endGame.call(this);
+            }
+        }
+
+        function endGame() {
+            gameOver = true;
+            this.physics.pause();
+            
+            const overlay = this.add.rectangle(400, 300, 800, 600, 0x000000, 0.7);
+            this.add.text(400, 250, 'GAME OVER', { 
+                fontSize: '64px', 
+                fill: '#ef4444',
+                fontWeight: 'bold'
+            }).setOrigin(0.5);
+            
+            this.add.text(400, 330, 'Final Score: ' + score, { 
+                fontSize: '32px', 
+                fill: '#f8fafc'
+            }).setOrigin(0.5);
+            
+            const restartBtn = this.add.text(400, 420, 'RESTART', { 
+                fontSize: '24px', 
+                fill: '#38bdf8',
+                backgroundColor: '#1e293b',
+                padding: { x: 20, y: 10 }
+            }).setOrigin(0.5).setInteractive();
+
+            restartBtn.on('pointerdown', () => {
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>

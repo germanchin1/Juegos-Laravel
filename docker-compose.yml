@@ -38,3 +38,13 @@ services:
             - POSTGRES_USER=refactorian
             - POSTGRES_PASSWORD=refactorian
             - POSTGRES_DB=refactorian
+
+    ####################################################################################################
+    # Facial Microservice
+    ####################################################################################################
+    facial:
+        build: ./microservicio_facial
+        ports:
+            - 5000:5000
+        volumes:
+            - ./microservicio_facial:/app

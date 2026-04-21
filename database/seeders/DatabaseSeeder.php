@@ -35,5 +35,11 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
         $player->roles()->attach($jugadorRole);
+
+        // Seed new games
+        $this->call([
+            StarCatcherSeeder::class,
+            MemoryMatchSeeder::class,
+        ]);
     }
 }
