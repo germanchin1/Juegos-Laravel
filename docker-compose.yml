@@ -48,3 +48,57 @@ services:
             - 5000:5000
         volumes:
             - ./microservicio_facial:/app
+
+    ####################################################################################################
+    # RabbitMQ
+    ####################################################################################################
+    rabbitmq:
+        image: rabbitmq:3-management
+        hostname: rabbitmq
+        ports:
+            - 5672:5672
+            - 15672:15672
+        environment:
+            - RABBITMQ_DEFAULT_USER=guest
+            - RABBITMQ_DEFAULT_PASS=guest
+
+    ####################################################################################################
+    # MCP GitHub
+    ####################################################################################################
+    mcp-github:
+        image: ghcr.io/github/github-mcp-server
+        environment:
+            - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+            - GITHUB_TOOLSETS=repos,issues,pull_requests
+        restart: always
+
+    ####################################################################################################
+    # MCP RabbitMQ
+    ####################################################################################################
+    mcp-rabbitmq:
+        image: python:3.11-slim
+        environment:
+            - RABBITMQ_HOST=rabbitmq
+            - RABBITMQ_PORT=5672
+            - RABBITMQ_USER=guest
+            - RABBITMQ_PASS=guest
+        command: >
+            bash -c "pip install uv && 
+            uvx amq-mcp-server-rabbitmq@latest --allow-mutative-tools"
+        depends_on:
+            - rabbitmq
+        restart: always
+
+    ####################################################################################################
+    # Ngrok (Expose to Internet)
+    ####################################################################################################
+    ngrok:
+        image: ngrok/ngrok:latest
+        environment:
+            - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+        command:
+            - http
+            - nginx:80
+        depends_on:
+            - nginx
+        restart: always

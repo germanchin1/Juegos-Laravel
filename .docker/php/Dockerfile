@@ -11,7 +11,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # mix
 RUN apt-get update \
   && apt-get install -y build-essential zlib1g-dev default-mysql-client curl gnupg procps vim git unzip libzip-dev libpq-dev \
-  && docker-php-ext-install zip pdo_mysql pdo_pgsql pgsql
+  && docker-php-ext-install zip pdo_mysql pdo_pgsql pgsql sockets bcmath
 
 # intl
 RUN apt-get install -y libicu-dev \
@@ -40,8 +40,6 @@ RUN docker-php-ext-install pcntl
 # Node.js, NPM, Yarn
 RUN curl -sL https://deb.nodesource.com/setup_22.x | bash -
 RUN apt-get install -y nodejs
-RUN npm install npm@latest -g
-RUN npm install yarn -g
 
 # Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
