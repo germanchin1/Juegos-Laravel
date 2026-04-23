@@ -1,122 +1,51 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-# Laravel Docker Starter Kit
-- Laravel v12.x
-- PHP v8.4.x
-- MySQL v8.1.x (default)
-- MariaDB v10.11.x
-- PostgreSQL v16.x
-- pgAdmin v4.x
-- phpMyAdmin v5.x
-- Mailpit v1.x
-- Node.js v18.x
-- NPM v10.x
-- Yarn v1.x
-- Vite v5.x
-- Rector v1.x
-- Redis v7.2.x
+# 📊 juegos-laravel: Ecosistema Local de Eventos
 
-# Requirements
-- Stable version of [Docker](https://docs.docker.com/engine/install/)
-- Compatible version of [Docker Compose](https://docs.docker.com/compose/install/#install-compose)
+Este proyecto es una plataforma de juegos basada en **Laravel 12**, potenciada con un sistema de arquitectura desacoplada mediante **RabbitMQ** y **MCP**.
 
-# How To Deploy
+---
 
-### For first time only !
-- `git clone https://github.com/refactorian/laravel-docker.git`
-- `cd laravel-docker`
-- `docker compose up -d --build`
-- `docker compose exec php bash`
-- `composer setup`
+## 🏗️ Arquitectura del Sistema
+El flujo de datos sigue este camino automatizado totalmente en local:
 
-### From the second time onwards
-- `docker compose up -d`
+`Desarrollador (Commit)` ➔ `Git Hook (Post-commit)` ➔ `RabbitMQ (Queue)` ➔ `Laravel Worker (Analyst Job)` ➔ `COMMIT_HISTORY.md`
 
-# Notes
+---
 
-### Laravel Versions
-- [Laravel 12.x](https://github.com/refactorian/laravel-docker/tree/main)
-- [Laravel 11.x](https://github.com/refactorian/laravel-docker/tree/laravel_11x)
-- [Laravel 10.x](https://github.com/refactorian/laravel-docker/tree/laravel_10x)
+## 📸 Registro Automático (Analista Interno)
+Cada vez que se realiza un commit, el **Analista Automático** procesa el evento y genera una entrada en el historial de actividad.
 
-### Laravel App
-- URL: http://localhost
+```markdown
+# 💾 Historial de Actividad (RabbitMQ)
 
-### Mailpit
-- URL: http://localhost:8025
+### 🚀 Commit Detectado: Test commit from AI
+- **Autor:** Germanchin
+- **Estado:** ✅ Procesado por el Analista Automático
+```
 
-### phpMyAdmin
-- URL: http://localhost:8080
-- Server: `db`
-- Username: `refactorian`
-- Password: `refactorian`
-- Database: `refactorian`
+---
 
-### Adminer
-- URL: http://localhost:9090
-- Server: `db`
-- Username: `refactorian`
-- Password: `refactorian`
-- Database: `refactorian`
+## 🚀 Cómo empezar en un clic
+He creado scripts maestros para que no tengas que configurar nada manualmente:
 
-### Basic docker compose commands
-- Build or rebuild services
-    - `docker compose build`
-- Create and start containers
-    - `docker compose up -d`
-- Stop and remove containers, networks
-    - `docker compose down`
-- Stop all services
-    - `docker compose stop`
-- Restart service containers
-    - `docker compose restart`
-- Run a command inside a container
-    - `docker compose exec [container] [command]`
+1.  **[full-start.bat](file:///e:/Juegos%20Laravel/full-start.bat)**: Enciende Docker, el Analyst Worker, Vite y abre el navegador.
+2.  **[stop-everything.bat](file:///e:/Juegos%20Laravel/stop-everything.bat)**: Apaga todo el entorno de forma segura.
 
-### Useful Laravel Commands
-- Display basic information about your application
-    - `php artisan about`
-- Remove the configuration cache file
-    - `php artisan config:clear`
-- Flush the application cache
-    - `php artisan cache:clear`
-- Clear all cached events and listeners
-    - `php artisan event:clear`
-- Delete all of the jobs from the specified queue
-    - `php artisan queue:clear`
-- Remove the route cache file
-    - `php artisan route:clear`
-- Clear all compiled view files
-    - `php artisan view:clear`
-- Remove the compiled class file
-    - `php artisan clear-compiled`
-- Remove the cached bootstrap files
-    - `php artisan optimize:clear`
-- Delete the cached mutex files created by scheduler
-    - `php artisan schedule:clear-cache`
-- Flush expired password reset tokens
-    - `php artisan auth:clear-resets`
+---
 
-### Laravel Pint (Code Style Fixer | PHP-CS-Fixer)
-- Format all files
-    - `vendor/bin/pint`
-- Format specific files or directories
-    - `vendor/bin/pint app/Models`
-    - `vendor/bin/pint app/Models/User.php`
-- Format all files with preview
-    - `vendor/bin/pint -v`
-- Format uncommitted changes according to Git
-    - `vendor/bin/pint --dirty`
-- Inspect all files
-  - `vendor/bin/pint --test`
+## 🛠️ Panel de Control
+| Servicio | URL | Acceso |
+| :--- | :--- | :--- |
+| **Laravel App** | http://localhost | - |
+| **RabbitMQ** | http://localhost:15672 | `guest` / `guest` |
+| **API Webhooks** | http://localhost/api/github-webhook | POST |
 
-### Rector
-- Dry Run
-    - `vendor/bin/rector process --dry-run`
-- Process
-    - `vendor/bin/rector process`
+---
 
-# Alternatives
-- [Laravel Sail](https://laravel.com/docs/master/sail)
-- [Laravel Herd](https://herd.laravel.com/)
-- [Laradock](https://laradock.io/)
+## 🤖 Guía para Inteligencia Artificial
+Si vas a usar este proyecto con **Claude** u otra IA, pásale el archivo especializado:
+👉 **[InstruccionesParaClaude.md](file:///e:/Juegos%20Laravel/InstruccionesParaClaude.md)**
+
+---
+*Desarrollado con ❤️ para aprendizaje de arquitecturas basadas en eventos.*
