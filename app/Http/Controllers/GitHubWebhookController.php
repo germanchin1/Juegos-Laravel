@@ -26,9 +26,8 @@ class GitHubWebhookController extends Controller
             'received_at' => now()->toIso8601String(),
         ];
 
-        // Publish to RabbitMQ
-        // We use the same 'events_queue' as the test command
-        Queue::pushRaw(json_encode($data), 'github_events_queue');
+        // Dispatch Job to RabbitMQ
+        \App\Jobs\ProcessGitCommit::dispatch($data);
 
         return response()->json([
             'status' => 'success',

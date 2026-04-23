@@ -44,10 +44,10 @@ class TestRabbitMQ extends Command
             'timestamp' => now()->toIso8601String(),
         ];
 
-        // Publish to RabbitMQ
-        Queue::pushRaw(json_encode($event), 'github_events_queue');
+        // Dispatch the Job to RabbitMQ
+        \App\Jobs\ProcessGitCommit::dispatch($event);
 
-        $this->info("🚀 Event sent to RabbitMQ!");
+        $this->info("🚀 Event sent to RabbitMQ (via Laravel Job)!");
         $this->table(['Field', 'Value'], [
             ['Author', $author],
             ['Branch', $branch],
