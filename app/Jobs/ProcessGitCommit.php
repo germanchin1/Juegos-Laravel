@@ -23,7 +23,7 @@ class ProcessGitCommit implements ShouldQueue
     public function handle(): void
     {
         $filePath = base_path('COMMIT_HISTORY.md');
-        
+
         $content = "### 🚀 Commit Detectado: " . ($this->data['message'] ?? 'Sin mensaje') . "\n";
         $content .= "- **Autor:** " . ($this->data['author'] ?? 'Desconocido') . "\n";
         $content .= "- **Rama:** " . ($this->data['branch'] ?? 'main') . "\n";
